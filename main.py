@@ -43,18 +43,18 @@ Resultados del análisis del prompt:
                 Analisis Linguístico
 -----------------------------------------------------------
       
-Entidades POS: {prompt.parsed_text.POS}
-Entidades NER: {prompt.parsed_text.NER}
+Entidades POS: {prompt.parsed_text.linguistic_analisys.pos}
+Entidades NER: {prompt.parsed_text.linguistic_analisys.ner}
 -----------------------------------------------------------
 -----------------------------------------------------------
                 Extraccion gramatical
 -----------------------------------------------------------
 
-Verbo raíz (acción principal): {prompt.parsed_text.root_verb}
+Verbo raíz (acción principal): {prompt.parsed_text.grammatical_extraction.root_verb}
 
-Objeto directo: {prompt.parsed_text.direct_object}
+Objeto directo: {prompt.parsed_text.grammatical_extraction.direct_object}
 
-Objetos indirectos: {prompt.parsed_text.indirect_objects}
+Objetos indirectos: {prompt.parsed_text.grammatical_extraction.indirect_objects}
 
 -----------------------------------------------------------
 -----------------------------------------------------------

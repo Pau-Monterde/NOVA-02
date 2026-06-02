@@ -8,11 +8,11 @@ nlp = spacy.load("en_core_web_sm")
 
 def linguistic_analysis(doc: Doc):
     # POS
-    pos_list:list[TokenData] = []
+    tokens:list[TokenData] = []
     
     for token in doc:
         if not token.is_punct and not token.is_stop:
-            pos_list.append(TokenData(token.text, token.lemma_, token.dep_, token.head.text))
+            tokens.append(TokenData(token.text, token.lemma_, token.dep_, token.head.text))
             
     
     # NER
@@ -21,46 +21,31 @@ def linguistic_analysis(doc: Doc):
     for ent in doc.ents:
         ner_list.append(EntityData(ent.text, ent.label_, ent.start_char, ent.end_char))
     
-    return LinguisticAnalysis(pos_list, ner_list)
+    return LinguisticAnalysis(tokens, ner_list)
 
 # Función para extraer la acción principal del prompt, que se corresponde con el verbo raíz (ROOT) de la frase.
 def extract_action(doc: Doc):
     for token in doc:
         if token.dep_ == "ROOT" and token.pos_ == "VERB":
-            return {
-                "text": token.text,
-                "lemma": token.lemma_,
-                "dep": token.dep_,
-                "head": token.head.text
-                }
+            return TokenData(token.text, token.lemma_, token.dep_, token.head.text)
     return None
 
 # Función para extraer el objeto directo del prompt, que se corresponde con el token que tiene una dependencia de "dobj" o "obj".
 def extract_direct_object(doc: Doc):
     for token in doc:
         if token.dep_ in ("dobj", "obj", "attr", "oprd"):
-            return {
-                "text": token.text,
-                "lemma": token.lemma_,
-                "dep": token.dep_,
-                "head": token.head.text
-                }
+            return TokenData(token.text, token.lemma_, token.dep_, token.head.text)
     return None
 
 def extract_indirect_objects(doc: Doc):
-    objs = []
+    objs:list[TokenData] = []
 
     for token in doc:
         if token.dep_ in ("pobj", "dative"):
-            objs.append({
-                "text": token.text,
-                "lemma": token.lemma_,
-                "dep": token.dep_,
-                "head": token.head.text
-                })
+            objs.append(TokenData(token.text, token.lemma_, token.dep_, token.head.text))
     return objs
 
-def gramatical_extraction(doc: Doc):
+def grammatical_extraction(doc: Doc):
 
     # Verbo raíz del prompt
     root_verb = extract_action(doc)
@@ -76,4 +61,4 @@ def gramatical_extraction(doc: Doc):
 def parse_text(string):
     doc = nlp(string)
 
-    return ParsedText(linguistic_analysis(doc), gramatical_extraction(doc))
+    return ParsedText(linguistic_analysis(doc), grammatical_extraction(doc))
