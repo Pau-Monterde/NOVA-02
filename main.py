@@ -12,30 +12,59 @@ with open(r"C:\Users\paumo\token.txt", "r", encoding="utf-8") as f:
     
 login(hf_token)
 
-prompt = Prompt(input(os.getenv("ASSISTANT") + ": "))
+# Test prompts para evaluar el sistema de extracción de entidades y detección de intenciones.
+test_prompts = [
+    "Send the photo",
 
-try:
-    print("Intentión detectada: " + prompt.intent.name)
-except:
-    pass
+    "Send the photo to John",
 
-print("Entidades detectadas: ")
-print(prompt.parsed_text)
+    "Remind me to call Sarah tomorrow at 5 PM",
 
-print("Resultado del analisis de emociones: ")
-print(prompt.emotion)
+    "Send the PDF to John and Mary via WhatsApp tomorrow morning",
 
-print("Entidades POS: ")
-print(prompt.parsed_text.POS)
+    "Can you send the latest project report to Michael through Telegram next Friday at 3 PM?",
 
-print("Entidades NER: ")
-print(prompt.parsed_text.NER)
+    # Bonus (más complejo)
+    "John's car needs to be sent to the repair shop tomorrow."
+]
 
-print("Objeto directo: ")
-print(prompt.parsed_text.direct_object)
+selected_prompt = test_prompts[int(input(os.getenv("ASSISTANT") + ": (0-5) "))]  # Solicitar al usuario que ingrese un prompt para analizar.
 
-print("Objetos indirectos: ")
-print(prompt.parsed_text.indirect_objects)
+print("Analizando el prompt: " + selected_prompt)  # Mostrar el prompt seleccionado para análisis.
+
+prompt = Prompt(selected_prompt)  # Crear una instancia de Prompt con el texto ingresado.
+
+# Mostrando el resultado del análisis de entidades, emociones y POS
+print(f"""
+Resultados del análisis del prompt:
+
+-----------------------------------------------------------
+-----------------------------------------------------------
+                Analisis Linguístico
+-----------------------------------------------------------
+      
+Entidades POS: {prompt.parsed_text.POS}
+Entidades NER: {prompt.parsed_text.NER}
+-----------------------------------------------------------
+-----------------------------------------------------------
+                Extraccion gramatical
+-----------------------------------------------------------
+
+Verbo raíz (acción principal): {prompt.parsed_text.root_verb}
+
+Objeto directo: {prompt.parsed_text.direct_object}
+
+Objetos indirectos: {prompt.parsed_text.indirect_objects}
+
+-----------------------------------------------------------
+-----------------------------------------------------------
+                Detección de Intenciones
+-----------------------------------------------------------
+
+                Aun no implementada
+
+""")
+
 
 
 """
