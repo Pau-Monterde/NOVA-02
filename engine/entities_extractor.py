@@ -1,9 +1,27 @@
+from annotated_types import doc
 import spacy
 from collections import defaultdict
 from spacy.tokens.doc import Doc
-from engine.engine_models.extracted_entities import ParsedText
+from engine.engine_models.text_parser.parsed_text import TokenData, EntityData, LinguisticAnalysis, GramaticalExtraction, ParsedText
 
 nlp = spacy.load("en_core_web_sm")
+
+def linguistic_analysis(doc: Doc):
+    # POS
+    pos_list:list[TokenData] = []
+    
+    for token in doc:
+        if not token.is_punct and not token.is_stop:
+            pos_list.append(TokenData(token.text, token.lemma_, token.dep_, token.head.text))
+            
+    
+    # NER
+    ner_list:list[EntityData] = []
+
+    for ent in doc.ents:
+        ner_list.append(EntityData(ent.text, ent.label_, ent.start_char, ent.end_char))
+    
+    return LinguisticAnalysis(pos_list, ner_list)
 
 # Función para extraer la acción principal del prompt, que se corresponde con el verbo raíz (ROOT) de la frase.
 def extract_action(doc: Doc):
@@ -42,33 +60,8 @@ def extract_indirect_objects(doc: Doc):
                 })
     return objs
 
-def parse_text(string):
-    doc = nlp(string)
+def gramatical_extraction(doc: Doc):
 
-    # POS
-    pos_dfdict = defaultdict(list)
-    
-    for token in doc:
-        if not token.is_punct and not token.is_stop:
-            pos_dfdict[token.pos_].append({
-                "text": token.text,
-                "lemma": token.lemma_,
-                "dep": token.dep_,
-                "head": token.head.text
-                })
-            print(token.text + ": " + token.dep_)
-    
-    # NER
-    ner_dfdict = defaultdict(list)
-
-    for ent in doc.ents:
-        if not ner_dfdict[ent.label_]:
-            ner_dfdict[ent.label_].append({
-                "text": ent.text,
-                "start": ent.start_char,
-                "end": ent.end_char,
-            })
-    
     # Verbo raíz del prompt
     root_verb = extract_action(doc)
 
@@ -78,4 +71,9 @@ def parse_text(string):
     # Objetos indirectos del prompt
     indirect_objects = extract_indirect_objects(doc)
 
-    return ParsedText(dict(pos_dfdict), dict(ner_dfdict), root_verb, direct_object, indirect_objects)
+    return GramaticalExtraction(root_verb, direct_object, indirect_objects)
+
+def parse_text(string):
+    doc = nlp(string)
+
+    return ParsedText(linguistic_analysis(doc), gramatical_extraction(doc))

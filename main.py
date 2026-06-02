@@ -1,5 +1,5 @@
 import os
-from engine.engine_models.prompt import Prompt
+from engine.engine_models.text_parser.prompt import Prompt
 from engine.intent_manager import detect_intent 
 import spacy, chunk, token
 from huggingface_hub import login
@@ -83,7 +83,4 @@ Context Check
 Decision Engine
  ↓
 Output
-
-
-Hi, today is a cold day. I would like to prove your capacity to talk and detect intents while your engine, designed by my separe all the entities of these text using spacy. Can you tell me the current time, please?
 """
