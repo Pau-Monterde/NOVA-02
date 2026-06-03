@@ -1,10 +1,10 @@
 import re
 from transformers import pipeline
 import spacy, chunk, token
-from engine.engine_models.text_parser.parsed_text import ParsedText
-from engine.intent_manager import detect_intent
-from engine.engine_models.intent_models import Intent
-from engine.entities_extractor import parse_text
+from engine.models.text_parser.parsed_text import ParsedText
+from engine.intent.intent_manager import detect_intent
+from engine.models.intent_models import Intent
+from engine.parser.text_parsing import parse_text
 
 
 class Prompt():

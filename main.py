@@ -1,6 +1,6 @@
 import os
-from engine.engine_models.text_parser.prompt import Prompt
-from engine.intent_manager import detect_intent 
+from engine.models.prompt import Prompt
+from engine.intent.intent_manager import detect_intent 
 import spacy, chunk, token
 from huggingface_hub import login
 from dotenv import load_dotenv
