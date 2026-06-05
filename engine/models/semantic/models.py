@@ -1,14 +1,24 @@
 # Capa semántica
 
-class SlotData:
-    def __init__(self, action=None, object=None, person=None, location=None, time=None, application=None):
-        self.action = action
-        self.object = object
-        self.person = person
-        self.location = location
-        self.time = time
-        self.application = application
+class RoleType():
+    ACTION = "ACTION"
+    AGENT = "AGENT"
+    TARGET = "TARGET"
+    RECIPIENT = "RECIPIENT"
+    LOCATION = "LOCATION"
+    TIME = "TIME"
 
-class SemanticExtraction:
-    def __init__(self, slots:SlotData):
-        self.slots = slots
+class RoleEntity():
+    def __init__(self, value:str, role:RoleType, source:str):
+        self.value = value
+        self.role = role
+        self.source = source
+
+class RoleFrame:
+    def __init__(self, roles:list[RoleEntity]):
+        self.roles = roles
+
+    def get_role(self, s_role:str):
+        for role in self.roles:
+            if role.role == s_role:
+                return role

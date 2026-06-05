@@ -1,9 +1,12 @@
 import re
 from transformers import pipeline
 import spacy, chunk, token
-from engine.models.text_parser.parsed_text import ParsedText
-from engine.intent.intent_manager import detect_intent
-from engine.models.intent_models import Intent
+from engine.models.semantic.models import RoleFrame
+from engine.semantic.extractor import extract_roles
+from engine.parser.text_parsing import parse_text
+from engine.intent.classifier import classify_intent
+from engine.models.intent.models import Intent
+
 from engine.parser.text_parsing import parse_text
 
 
@@ -16,11 +19,14 @@ class Prompt():
         # Nivel de estado de animo
         self.emotion = pipeline("text-classification", model="monologg/bert-base-cased-goemotions-original")(self.string)
 
-        # Intención
-        self.intent:Intent | None = detect_intent(self.w_list)
+        # Texto parseado 
+        self.parsed_text = parse_text(string)
 
         # Entidades separadas
-        self.parsed_text:ParsedText = parse_text(string)
+        self.role_frame:RoleFrame = extract_roles(parse_text(self.string))
+
+        # Intención
+        self.intent:Intent = classify_intent(self.role_frame)
         
 
      

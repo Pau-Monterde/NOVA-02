@@ -1,7 +1,5 @@
 import spacy
-from collections import defaultdict
-from spacy.tokens.doc import Doc
-from engine.models.parser.models import TokenData, EntityData, LinguisticAnalysis, GramaticalExtraction, ParsedText
+from engine.models.parser.models import ParsedText
 from engine.parser.linguistic.analyzer import linguistic_analisys
 from engine.parser.grammar.extractor import grammatical_extraction
 

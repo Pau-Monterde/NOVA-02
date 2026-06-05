@@ -1,25 +1,47 @@
 from engine.models.parser.models import ParsedText
-from engine.models.semantic.models import SlotData, SemanticExtraction
+from engine.models.semantic.models import RoleType, RoleEntity, RoleFrame
 
-PERSON_NER = "PERSON"
-LOCATION_NER = "GPE"
+def deduplicate_roles(roles:list[RoleEntity]):
+    seen = {}
 
-def extract_semantic(parsed_text: ParsedText) -> SemanticExtraction:
-    slots = SlotData()
+    for r in roles:
+        re = (r.value, r.role)
+
+        if not re in seen:
+            seen[re] = r
+
+    return list(seen.values())
+
+def extract_roles(parsed_text: ParsedText):
+    roles = []
+
+    grammar = parsed_text.grammatical_extraction
+    ner = parsed_text.linguistic_analisys.ner
+
+    # Extraer roles basados en la gramática con clases de rol
     
-    if parsed_text.grammatical_extraction.root_verb:
-        slots.action = parsed_text.grammatical_extraction.root_verb.lemma_
+    if grammar.root_verb:
+        roles.append(RoleEntity(grammar.root_verb.lemma, RoleType.ACTION, "GRAMMAR"))
     
-    if parsed_text.grammatical_extraction.direct_object:
-        slots.object = parsed_text.grammatical_extraction.direct_object.lemma_
+    if grammar.direct_object:
+        roles.append(RoleEntity(grammar.direct_object.lemma, RoleType.TARGET, "GRAMMAR"))
+
+    if len(grammar.indirect_objects) > 0:
+        for obj in grammar.indirect_objects:
+            roles.append(RoleEntity(obj.lemma, RoleType.RECIPIENT, "GRAMMMAR"))
     
-    if parsed_text.grammatical_extraction.indirect_objects:
-        for ent in parsed_text.linguistic_analisys.ner:
-            if ent.label == "PERSON":
-                slots.person = ent
-            elif ent.label == "GPE":
-                slots.location = ent
+    # Extraer roles basados en NER
+    for ent in ner:
+        if ent.label == "PERSON":
+            roles.append(RoleEntity(ent.text, RoleType.RECIPIENT, "NER"))
+
+        if ent.label == ("GPE", "LOC"):
+            roles.append(RoleEntity(ent.text, RoleType.LOCATION, "NER"))
+
+        if ent.label == ("DATE", "TIME"):
+            roles.append(RoleEntity(ent.text, RoleType.TIME, "NER"))
     
-    return SemanticExtraction(slots)
+    return RoleFrame(deduplicate_roles(roles))
+
 
     
