@@ -59,7 +59,7 @@ test_prompts = [
     "Send the presentation to John and Mary via WhatsApp tomorrow at 9 AM from Barcelona"
 ]
 
-selected_prompt = test_prompts[int(input(os.getenv("ASSISTANT") + ": (0-5) "))]  # Solicitar al usuario que ingrese un prompt para analizar.
+selected_prompt = test_prompts[int(input(os.getenv("ASSISTANT") + ": (0-14) "))]  # Solicitar al usuario que ingrese un prompt para analizar.
 
 print("Analizando el prompt: " + selected_prompt)  # Mostrar el prompt seleccionado para análisis.
 
@@ -86,9 +86,9 @@ Entidades NER: {prompt.parsed_text.linguistic_analisys.ner}
                 Extraccion gramatical
 -----------------------------------------------------------
 
-Verbo raíz (acción principal): {prompt.parsed_text.grammatical_extraction.root_verb}
+Verbo raíz (acción principal): {prompt.parsed_text.grammatical_extraction.root_verb.lemma}
 
-Objeto directo: {prompt.parsed_text.grammatical_extraction.direct_object}
+Objeto directo: {prompt.parsed_text.grammatical_extraction.direct_object.lemma}
 
 Objetos indirectos: {prompt.parsed_text.grammatical_extraction.indirect_objects}
 
