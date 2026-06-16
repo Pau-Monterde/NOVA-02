@@ -6,6 +6,8 @@ from engine.semantic.extractor import extract_roles
 from engine.parser.text_parsing import parse_text
 from engine.intent.classifier import classify_intent
 from engine.models.intent.models import Intent
+from engine.executor.executor import execute
+from engine.models.executor.models import ExecutionResult
 
 from engine.parser.text_parsing import parse_text
 
@@ -27,6 +29,9 @@ class Prompt():
 
         # Intención
         self.intent:Intent = classify_intent(self.role_frame)
+
+        # Ejecución
+        self.execution:ExecutionResult = execute(self.intent)
         
 
      

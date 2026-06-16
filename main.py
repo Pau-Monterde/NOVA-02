@@ -107,6 +107,12 @@ Roles detectados: {rolesv_list}
 Intención detectada: {prompt.intent.name}
 Puntuación: {prompt.intent.score}
 
+-----------------------------------------------------------
+-----------------------------------------------------------
+                Resultado de la ejecución
+-----------------------------------------------------------
+
+Estatus: {prompt.execution}
 """)
 
 
