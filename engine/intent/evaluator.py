@@ -1,5 +1,5 @@
-from engine.models.intent.models import Intent, IntentRule, INTENT_RULES
-from engine.models.semantic.models import RoleFrame
+from engine.models.intent_models import IntentRule
+from engine.models.semantic_models import RoleFrame
 
 def score_rule(rule:IntentRule, frame:RoleFrame):
     score = 0

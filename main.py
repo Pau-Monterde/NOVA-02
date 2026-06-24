@@ -1,5 +1,6 @@
 import os
-from engine.models.RequestContext import RequestContext
+from engine.context_generator import generate_rcontext
+from engine.models.context_model import RequestContext
 from huggingface_hub import login
 from dotenv import load_dotenv
 
@@ -63,11 +64,11 @@ selected_prompt = test_prompts[int(input(os.getenv("ASSISTANT") + ": (0-14) "))]
 
 print("Analizando el prompt: " + selected_prompt)  # Mostrar el prompt seleccionado para análisis.
 
-prompt = RequestContext(selected_prompt)  # Crear una instancia de Prompt con el texto ingresado.
+context:RequestContext = generate_rcontext(selected_prompt)  # Crear una instancia de Prompt con el texto ingresado.
 
 rolesv_list = []
 
-for i in prompt.role_frame.roles:
+for i in context.role_frame.roles:
     rolesv_list.append(f"{i.value}: {i.role}")
 
 # Mostrando el resultado del análisis de entidades, emociones y POS
@@ -79,18 +80,18 @@ Resultados del análisis del prompt:
                 Analisis Linguístico
 -----------------------------------------------------------
       
-Entidades POS: {prompt.parsed_text.linguistic_analisys.pos}
-Entidades NER: {prompt.parsed_text.linguistic_analisys.ner}
+Entidades POS: {context.parsed_text.linguistic_analisys.pos}
+Entidades NER: {context.parsed_text.linguistic_analisys.ner}
 -----------------------------------------------------------
 -----------------------------------------------------------
                 Extraccion gramatical
 -----------------------------------------------------------
 
-Verbo raíz (acción principal): {prompt.parsed_text.grammatical_extraction.root_verb.lemma}
+Verbo raíz (acción principal): {context.parsed_text.grammatical_extraction.root_verb.lemma}
 
-Objeto directo: {prompt.parsed_text.grammatical_extraction.direct_object.lemma}
+Objeto directo: {context.parsed_text.grammatical_extraction.direct_object.lemma}
 
-Objetos indirectos: {prompt.parsed_text.grammatical_extraction.indirect_objects}
+Objetos indirectos: {context.parsed_text.grammatical_extraction.indirect_objects}
 
 -----------------------------------------------------------
 -----------------------------------------------------------
@@ -104,15 +105,15 @@ Roles detectados: {rolesv_list}
                 Detección de Intención
 -----------------------------------------------------------
 
-Intención detectada: {prompt.intent.rule.name}
-Puntuación: {prompt.intent.score}
+Intención detectada: {context.intent.rule.name}
+Puntuación: {context.intent.score}
 
 -----------------------------------------------------------
 -----------------------------------------------------------
                 Resultado de la ejecución
 -----------------------------------------------------------
 
-Estatus: {prompt.execution()}
+Estatus: {context.execution_result.success}
 """)
 
 

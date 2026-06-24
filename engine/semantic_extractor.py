@@ -1,5 +1,5 @@
-from engine.models.parser.models import ParsedText
-from engine.models.semantic.models import RoleType, RoleEntity, RoleFrame
+from engine.models.parser_models import ParsedText
+from engine.models.semantic_models import RoleType, RoleEntity, RoleFrame
 
 def deduplicate_roles(roles:list[RoleEntity]):
     seen = {}

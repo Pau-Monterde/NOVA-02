@@ -1,10 +1,11 @@
-from engine.models.intent.models import Intent, IntentRule, INTENT_RULES
-from engine.models.executor.models import ExecutionResult
+from engine.models.context_model import RequestContext
+from engine.models.context_model import ExecutionResult
+from engine.models.executor_models import ExecutionResult
 from engine.models.exceptions.IntentNotFound import IntentNotFoundException
 
-def execute(intent:Intent):
-    try: 
-        success, data, error = intent.rule.execution()
-        return ExecutionResult(success, data, error)
-    except Exception as e:
-        print("Ha habido un error")
+def execute(context:RequestContext):
+    print("HOla munod")
+    context.intent.rule.execution(context)
+    execution_result:ExecutionResult = ExecutionResult(True)
+    return execution_result
+

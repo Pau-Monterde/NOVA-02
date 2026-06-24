@@ -1,4 +1,4 @@
-from engine.models.parser.models import TokenData, EntityData, LinguisticAnalysis
+from engine.models.parser_models import TokenData, EntityData, LinguisticAnalysis
 from spacy.tokens.doc import Doc
 
 def linguistic_analisys(doc: Doc):

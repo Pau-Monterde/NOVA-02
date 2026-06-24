@@ -1,4 +1,4 @@
-from engine.models.parser.models import TokenData, EntityData, GrammaticalExtraction
+from engine.models.parser_models import TokenData, EntityData, GrammaticalExtraction
 from spacy.tokens.doc import Doc
 
 # Función para extraer la acción principal del prompt, que se corresponde con el verbo raíz (ROOT) de la frase.
