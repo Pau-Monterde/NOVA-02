@@ -5,9 +5,11 @@ def score_rule(rule:IntentRule, frame:RoleFrame):
     score = 0
 
     action = frame.get_role("ACTION")
-
+    print(action)
     if action and action.value in rule.actions:
         score += 50
+    else: 
+        score -= 50
 
     roles_present = {
         role.role

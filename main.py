@@ -1,138 +1,85 @@
 import os
+from engine.models.exceptions.context_exceptions import ContextNotCreatedException
 from engine.context_generator import generate_rcontext
 from engine.models.context_model import RequestContext
-from huggingface_hub import login
-from dotenv import load_dotenv
+from engine.executor.executor import execute
 
-load_dotenv()
+def context_generation(prompt:str):
+    print("Analizando el prompt: " + prompt)  # Mostrar el prompt seleccionado para análisis.
 
-with open(r"C:\Users\paumo\token.txt", "r", encoding="utf-8") as f:
-    hf_token = f.readline()
+    context:RequestContext = generate_rcontext(prompt)  # Crear una instancia de Prompt con el texto ingresado.
+
+    if not context.status.success:
+        raise ContextNotCreatedException() 
     
-login(hf_token)
+    return context
+    
+def chatbot(prompt:str):
 
-# Test prompts para evaluar el sistema de extracción de entidades y detección de intenciones.
-test_prompts = [
+    try:
+        context:RequestContext = context_generation(prompt)
+    
 
-    # ACTION + TARGET
-    "Open Spotify",
+        print("------------------------------------------ LINGUISTIC ANALISYS ------------------------------------------")
 
-    # ACTION + TARGET + RECIPIENT
-    "Send the photo to John",
+        print("--------------------- IMPORTANT POS ---------------------")
+        for token in context.parsed_text.linguistic_analisys.pos:
+            print(token.text + ": " + token.dep)
 
-    # ACTION + TARGET + LOCATION
-    "Find restaurants in Barcelona",
+        print("--------------------- NER ---------------------")
+        for ent in context.parsed_text.linguistic_analisys.ner:
+            print(ent.text + ": " + ent.label)
 
-    # ACTION + TARGET + TIME
-    "Remind me to call Sarah tomorrow at 5 PM",
+        # print("------------------------------------------ GRAMATICAL EXTRACTION ------------------------------------------")
 
-    # ACTION + TARGET + RECIPIENT + TIME
-    "Send the project report to Michael next Friday",
+        # print("Root verb: " + context.parsed_text.grammatical_extraction.root_verb.text)
 
-    # ACTION + TARGET + RECIPIENT + LOCATION + TIME
-    "Send the PDF to John in Madrid tomorrow morning",
+        # print("Direct object: " + context.parsed_text.grammatical_extraction.direct_object.text)
 
-    # Múltiples recipients
-    "Send the report to John and Mary",
+        # for in_obj in context.parsed_text.grammatical_extraction.indirect_objects:
+        #     print("Object: " + in_obj.text)
+        #     print("Object parent: " + in_obj.head_text)
 
-    # Múltiples entidades NER
-    "Book a meeting with Sarah in London on June 15th",
+        print("------------------------------------------ PARSER EXCEPTIONS ------------------------------------------")
+        print("--------------------- ANALYZER ---------------------")
 
-    # Pregunta natural
-    "Can you send the latest project report to Michael through Telegram next Friday at 3 PM?",
-
-    # Voz pasiva (muy útil para probar grammar)
-    "John's car needs to be sent to the repair shop tomorrow.",
-
-    # Sin NER
-    "Delete the temporary files",
-
-    # Objeto compuesto
-    "Create a new Python project",
-
-    # Lugar + persona
-    "Meet John at the airport",
-
-    # Fecha relativa
-    "Schedule a meeting with Alice next week",
-
-    # Caso complejo
-    "Send the presentation to John and Mary via WhatsApp tomorrow at 9 AM from Barcelona"
-]
-
-selected_prompt = test_prompts[int(input(os.getenv("ASSISTANT") + ": (0-14) "))]  # Solicitar al usuario que ingrese un prompt para analizar.
-
-print("Analizando el prompt: " + selected_prompt)  # Mostrar el prompt seleccionado para análisis.
-
-context:RequestContext = generate_rcontext(selected_prompt)  # Crear una instancia de Prompt con el texto ingresado.
-
-rolesv_list = []
-
-for i in context.role_frame.roles:
-    rolesv_list.append(f"{i.value}: {i.role}")
-
-# Mostrando el resultado del análisis de entidades, emociones y POS
-print(f"""
-Resultados del análisis del prompt:
-
------------------------------------------------------------
------------------------------------------------------------
-                Analisis Linguístico
------------------------------------------------------------
-      
-Entidades POS: {context.parsed_text.linguistic_analisys.pos}
-Entidades NER: {context.parsed_text.linguistic_analisys.ner}
------------------------------------------------------------
------------------------------------------------------------
-                Extraccion gramatical
------------------------------------------------------------
-
-Verbo raíz (acción principal): {context.parsed_text.grammatical_extraction.root_verb.lemma}
-
-Objeto directo: {context.parsed_text.grammatical_extraction.direct_object.lemma}
-
-Objetos indirectos: {context.parsed_text.grammatical_extraction.indirect_objects}
-
------------------------------------------------------------
------------------------------------------------------------
-                Detección de Roles
------------------------------------------------------------
-
-Roles detectados: {rolesv_list}
-
------------------------------------------------------------
------------------------------------------------------------
-                Detección de Intención
------------------------------------------------------------
-
-Intención detectada: {context.intent.rule.name}
-Puntuación: {context.intent.score}
-
------------------------------------------------------------
------------------------------------------------------------
-                Resultado de la ejecución
------------------------------------------------------------
-
-Estatus: {context.execution_result.success}
-""")
+        for p_exception in context.status.parser_exceptions.analyzer_exceptions:
+            print(p_exception)
+        
+        print("--------------------- EXTRACTOR ---------------------")
+        for p_exception in context.status.parser_exceptions.extractor_exceptions:
+            print(p_exception)
+    
+    except ContextNotCreatedException as e:
+        print("Sorry, i can't create a context from the input you introduced")
+        print(e)
 
 
+    # try: 
+    #     context.execution_result = execute(context)
+    # except:
+    #     pass
+
+while(True):
+    #selected_prompt = test_prompts[int(input(os.getenv("ASSISTANT") + ": (0-14) "))]  # Solicitar al usuario que ingrese un prompt para analizar.
+    prompt = input("NOVA-02: ")
+    chatbot(prompt)
 
 """
 Input
- ↓
+↓
 Preprocess
- ↓
+↓
 Entity Extraction
- ↓
+↓
 Context Generation
- ↓
+↓
 Context Check
- ↓
+↓
 Intent Execution
- ↓
+↓
 Decision Engine
- ↓
+↓
 Output
 
 """

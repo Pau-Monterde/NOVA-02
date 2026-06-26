@@ -17,20 +17,27 @@ class EntityData:
         self.end = end
 
 class LinguisticAnalysis():
-    def __init__(self, pos: list[TokenData], ner: list[EntityData]):
+    def __init__(self, pos:list[TokenData], ner:list[EntityData]):
         self.pos = pos
         self.ner = ner
 
 # Capa gramatical
 
 class GrammaticalExtraction():
-    def __init__(self, root_verb:TokenData, direct_object:TokenData, indirect_objects:list[TokenData]):
+    def __init__(self, root_verb:TokenData | None, direct_object:TokenData | None, indirect_objects:list[TokenData] | None):
         self.root_verb = root_verb
         self.direct_object = direct_object
         self.indirect_objects = indirect_objects
+
+# Agrupación
 
 class ParsedText():
     def __init__(self, linguistic_analisys:LinguisticAnalysis, grammatical_extraction:GrammaticalExtraction):
         self.linguistic_analisys = linguistic_analisys
         self.grammatical_extraction = grammatical_extraction
+
+class ParserExceptions():
+    def __init__(self, analyzer_exceptions:list[Exception], extractor_exceptions:list[Exception]):
+        self.analyzer_exceptions = analyzer_exceptions
+        self.extractor_exceptions = extractor_exceptions       
 

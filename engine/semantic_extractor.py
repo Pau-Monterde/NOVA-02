@@ -13,7 +13,7 @@ def deduplicate_roles(roles:list[RoleEntity]):
     return list(seen.values())
 
 def extract_roles(parsed_text: ParsedText):
-    roles = []
+    roles:list[RoleEntity] = []
 
     grammar = parsed_text.grammatical_extraction
     ner = parsed_text.linguistic_analisys.ner
@@ -35,12 +35,12 @@ def extract_roles(parsed_text: ParsedText):
         if ent.label == "PERSON":
             roles.append(RoleEntity(ent.text, RoleType.RECIPIENT, "NER"))
 
-        if ent.label == ("GPE", "LOC"):
+        if ent.label in ("GPE", "LOC"):
             roles.append(RoleEntity(ent.text, RoleType.LOCATION, "NER"))
 
-        if ent.label == ("DATE", "TIME"):
+        if ent.label in ("DATE", "TIME"):
             roles.append(RoleEntity(ent.text, RoleType.TIME, "NER"))
-    
+
     return RoleFrame(deduplicate_roles(roles))
 
 

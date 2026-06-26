@@ -1,23 +1,33 @@
 import re
 from transformers import pipeline
-from engine.models.context_model import RequestContext
+from engine.models.context_model import RequestContext, ContextStatus
+from engine.models.exceptions.context_exceptions import LinguisticAnalyzerFatalException, ContextNotCreatedException
 from engine.semantic_extractor import extract_roles
 from engine.parser.text_parsing import parse_text
 from engine.intent.classifier import classify_intent
 from engine.parser.text_parsing import parse_text
-from engine.executor.executor import execute
     
-def generate_rcontext(string:str):
-    context = RequestContext(string)
+def generate_rcontext(prompt:str):
+        context_status = ContextStatus()
+        #w_list = re.sub(r"([^\w\s])", r" \1 ", string).lower().split()
+        try:
+                parsed_text, context_status.parser_exceptions = parse_text(prompt)
+        except LinguisticAnalyzerFatalException as e:
+                context_status.fatal_exception = e
+                context_status.success = False
+                raise ContextNotCreatedException(context_status.fatal_exception)
 
-    context.string = string.lower()
-    context.w_list = re.sub(r"([^\w\s])", r" \1 ", context.string).lower().split()
-    context.emotion = pipeline("text-classification", model="monologg/bert-base-cased-goemotions-original")(context.string)
-    context.parsed_text = parse_text(context.string)
-    context.role_frame = extract_roles(context.parsed_text)
-    context.intent = classify_intent(context.role_frame)
-    context.execution_result = execute(context)
 
-    return(context)
+        # role_frame = extract_roles(parsed_text)
+        # try: 
+        #         intent = classify_intent(role_frame)
+        # except IntentNotFoundException as infe:
+        #         context_status.fatal_error = infe
+        #         print("Sorry, i didn't understood what do you want me to do")
+
+        return RequestContext(prompt_str=prompt, parsed_text=parsed_text, status=context_status)
+
+
+        
 
 
