@@ -14,9 +14,9 @@ class LinguisticAnalyzerFatalException(Exception):
     def __init__(self, exception_causer:Exception):
         super().__init__(f"A fatal exception makes NOVA-02 unable to process your request --> {exception_causer}")
 
-class NotActionInContextException(Exception):
+class NotRootVerbInContextException(Exception):
     def __init__(self):
-        super().__init__("There aren't instructions in context")
+        super().__init__("There isn't a root verb in context")
 
 class NotDirectObjInContextException(Exception):
     def __init__(self):
@@ -29,3 +29,7 @@ class NotIndObjsInContextException(Exception):
 class IntentNotFoundException(Exception):
     def __init__(self):
         super().__init__("Cannot detect an intent")
+
+class AnyRoleAssignmentException(Exception):
+    def __init__(self):
+        super().__init__("Cannot assign roles")

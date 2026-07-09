@@ -1,16 +1,16 @@
 from engine.models.parser_models import ParsedText
 from engine.models.semantic_models import RoleType, RoleEntity, RoleFrame
+from engine.models.exceptions.context_exceptions import AnyRoleAssignmentException
 
 def deduplicate_roles(roles:list[RoleEntity]):
-    seen = {}
+    seen = []
+    seen_values = []
 
-    for r in roles:
-        re = (r.value, r.role)
-
-        if not re in seen:
-            seen[re] = r
-
-    return list(seen.values())
+    for role in roles:
+        if role.value not in seen_values:
+            seen_values.append(role.value)
+            seen.append(role)
+    return seen
 
 def extract_roles(parsed_text: ParsedText):
     roles:list[RoleEntity] = []
@@ -32,16 +32,61 @@ def extract_roles(parsed_text: ParsedText):
     
     # Extraer roles basados en NER
     for ent in ner:
+        # Extraer roles basados en NER
         if ent.label == "PERSON":
             roles.append(RoleEntity(ent.text, RoleType.RECIPIENT, "NER"))
 
-        if ent.label in ("GPE", "LOC"):
+        elif ent.label in ("GPE", "LOC", "FAC"):
             roles.append(RoleEntity(ent.text, RoleType.LOCATION, "NER"))
 
-        if ent.label in ("DATE", "TIME"):
+        elif ent.label in ("DATE", "TIME"):
             roles.append(RoleEntity(ent.text, RoleType.TIME, "NER"))
 
+        elif ent.label == "ORG":
+            roles.append(RoleEntity(ent.text, RoleType.ORGANIZATION, "NER"))
+
+        elif ent.label == "EVENT":
+            roles.append(RoleEntity(ent.text, RoleType.EVENT, "NER"))
+
+        elif ent.label in ("PRODUCT", "WORK_OF_ART"):
+            roles.append(RoleEntity(ent.text, RoleType.TARGET, "NER"))
+
+        elif ent.label == "LANGUAGE":
+            roles.append(RoleEntity(ent.text, RoleType.LANGUAGE, "NER"))
+
+        elif ent.label == "MONEY":
+            roles.append(RoleEntity(ent.text, RoleType.MONEY, "NER"))
+
+        elif ent.label == "QUANTITY":
+            roles.append(RoleEntity(ent.text, RoleType.QUANTITY, "NER"))
+
+        elif ent.label == "PERCENT":
+            roles.append(RoleEntity(ent.text, RoleType.PERCENTAGE, "NER"))
+
+        elif ent.label == "CARDINAL":
+            roles.append(RoleEntity(ent.text, RoleType.NUMBER, "NER"))
+
+        elif ent.label == "ORDINAL":
+            roles.append(RoleEntity(ent.text, RoleType.ORDINAL, "NER"))
+
+        elif ent.label == "LAW":
+            roles.append(RoleEntity(ent.text, RoleType.LAW, "NER"))
+
+        elif ent.label == "NORP":
+            roles.append(RoleEntity(ent.text, RoleType.GROUP, "NER"))
+
+    if len(roles) == 0:
+        raise AnyRoleAssignmentException()
+        
     return RoleFrame(deduplicate_roles(roles))
 
+
+def roles_extraction(parsed_text:ParsedText):
+    semantic_exceptions_list:list[Exception] = []
+    try:
+        return extract_roles(parsed_text), None
+    except AnyRoleAssignmentException as e:
+        semantic_exceptions_list.append(e)
+        return None, semantic_exceptions_list
 
     

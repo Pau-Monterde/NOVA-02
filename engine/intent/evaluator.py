@@ -1,23 +1,23 @@
 from engine.models.intent_models import IntentRule
-from engine.models.semantic_models import RoleFrame
+from engine.models.semantic_models import RoleFrame, RoleEntity
+from engine.models.parser_models import ParsedText
 
-def score_rule(rule:IntentRule, frame:RoleFrame):
+def score_rule(rule:IntentRule, frame:RoleFrame, p_text:ParsedText):
     score = 0
+    
+    action:RoleEntity = frame.get_role("ACTION")
 
-    action = frame.get_role("ACTION")
-    print(action)
     if action and action.value in rule.actions:
         score += 50
+    
     else: 
-        score -= 50
+        not_roled_actions_found = 0
+        for token in p_text.linguistic_analisys.pos:
+            if token.lemma in rule.actions:
+                not_roled_actions_found += 1
+                score += 25
 
-    roles_present = {
-        role.role
-        for role in frame.roles
-    }
-
-    for required in rule.required_roles:
-        if required in roles_present:
-            score += 25
+        if not_roled_actions_found == 0:
+            score -= 50
 
     return score

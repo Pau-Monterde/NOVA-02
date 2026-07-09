@@ -1,8 +1,6 @@
-import os
-from engine.models.exceptions.context_exceptions import ContextNotCreatedException
+from engine.models.exceptions.context_exceptions import ContextNotCreatedException, NotRootVerbInContextException
 from engine.context_generator import generate_rcontext
 from engine.models.context_model import RequestContext
-from engine.executor.executor import execute
 
 def context_generation(prompt:str):
     print("Analizando el prompt: " + prompt)  # Mostrar el prompt seleccionado para análisis.
@@ -22,7 +20,7 @@ def chatbot(prompt:str):
 
         print("------------------------------------------ LINGUISTIC ANALISYS ------------------------------------------")
 
-        print("--------------------- IMPORTANT POS ---------------------")
+        print("--------------------- POS ---------------------")
         for token in context.parsed_text.linguistic_analisys.pos:
             print(token.text + ": " + token.dep)
 
@@ -30,15 +28,40 @@ def chatbot(prompt:str):
         for ent in context.parsed_text.linguistic_analisys.ner:
             print(ent.text + ": " + ent.label)
 
-        # print("------------------------------------------ GRAMATICAL EXTRACTION ------------------------------------------")
+        print("------------------------------------------ GRAMATICAL EXTRACTION ------------------------------------------")
+        try: 
+            rv = context.parsed_text.grammatical_extraction.root_verb.text
+            if rv: 
+                print("Root verb: " + rv)
+        except NotRootVerbInContextException as e: print(e)
 
-        # print("Root verb: " + context.parsed_text.grammatical_extraction.root_verb.text)
+        try:
+            do = context.parsed_text.grammatical_extraction.direct_object.text
+            if do:
+                print("Direct object: " + do)
+        except: pass
 
-        # print("Direct object: " + context.parsed_text.grammatical_extraction.direct_object.text)
+        for in_obj in context.parsed_text.grammatical_extraction.indirect_objects:
+            print("Object: " + in_obj.text)
+            print("Object parent: " + in_obj.head_text)
+        
+        if not context.parsed_text.grammatical_extraction.indirect_objects:
+            print("There aren't indirect objects in context")
+        
+        print("------------------------------------------ ROLES DETECTION ------------------------------------------")
+        if context.role_frame:
+            context.role_frame.show_roles()
+        else: 
+            print("There isn't any role assignment: ") 
+            for se in context.status.semantic_exceptions:
+                print(se)
 
-        # for in_obj in context.parsed_text.grammatical_extraction.indirect_objects:
-        #     print("Object: " + in_obj.text)
-        #     print("Object parent: " + in_obj.head_text)
+
+        print("------------------------------------------ INTENT DETECTION ------------------------------------------")
+        try:
+            print(context.intent.rule.name)
+        except Exception as e:
+            print(context.status.fatal_exception)
 
         print("------------------------------------------ PARSER EXCEPTIONS ------------------------------------------")
         print("--------------------- ANALYZER ---------------------")
@@ -54,9 +77,8 @@ def chatbot(prompt:str):
         print("Sorry, i can't create a context from the input you introduced")
         print(e)
 
-
     # try: 
-    #     context.execution_result = execute(context)
+    #     context.execution_result = execute(context) 
     # except:
     #     pass
 
@@ -65,21 +87,5 @@ while(True):
     prompt = input("NOVA-02: ")
     chatbot(prompt)
 
-"""
-Input
-↓
-Preprocess
-↓
-Entity Extraction
-↓
-Context Generation
-↓
-Context Check
-↓
-Intent Execution
-↓
-Decision Engine
-↓
-Output
 
-"""
+

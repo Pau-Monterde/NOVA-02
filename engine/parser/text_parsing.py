@@ -15,5 +15,8 @@ def parse_text(string):
             raise LinguisticAnalyzerFatalException(analyzer_exceptions[i]) 
                 
     extraction, extractor_exceptions = grammatical_extraction(doc)
+    # for i in range(len(extractor_exceptions)):
+    #     if type(extractor_exceptions[i]) == Exception:
+    #         raise Exception(analyzer_exceptions[i]) 
 
     return ParsedText(analisys, extraction), ParserExceptions(analyzer_exceptions, extractor_exceptions)  

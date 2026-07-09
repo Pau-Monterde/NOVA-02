@@ -1,5 +1,6 @@
 from engine.models.semantic_models import RoleFrame
 from engine.models.intent_models import Intent, IntentRule
+from engine.models.parser_models import ParsedText
 from engine.executor.skills.file_sender import send_file
 from engine.executor.skills.app_opening import open_app
 from engine.intent.evaluator import score_rule
@@ -21,16 +22,16 @@ INTENT_RULES = [
     )
 ]
 
-def classify_intent(frame:RoleFrame):
+def classify_intent(frame:RoleFrame, p_text:ParsedText):
     best_intent = None
     best_score = 0
 
     for rule in INTENT_RULES:
-        score = score_rule(rule, frame)
+        score = score_rule(rule, frame, p_text)
+
         if score > best_score:
             best_score = score
             best_intent = rule
-            print(best_intent)
     
     if not best_intent:
         raise IntentNotFoundException()
