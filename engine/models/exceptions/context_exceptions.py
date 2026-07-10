@@ -33,3 +33,15 @@ class IntentNotFoundException(Exception):
 class AnyRoleAssignmentException(Exception):
     def __init__(self):
         super().__init__("Cannot assign roles")
+
+class RequiredRolesNotFoundException(Exception):
+    def __init__(self):
+        super().__init__("There aren't required roles in context")
+
+class KeywordsNotFoundException(Exception):
+    def __init__(self):
+        super().__init__("There aren't keywords in context")
+
+class ActionNotFoundException(Exception):
+    def __init__(self):
+        super().__init__("There isn't an action in context")

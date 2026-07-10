@@ -12,7 +12,7 @@ def context_generation(prompt:str):
     
     return context
     
-def chatbot(prompt:str):
+def testing_chatbot(prompt:str):
 
     try:
         context:RequestContext = context_generation(prompt)
@@ -82,10 +82,21 @@ def chatbot(prompt:str):
     # except:
     #     pass
 
+def chatbot(prompt:str):
+    try: 
+        context:RequestContext = context_generation(prompt)
+        print(context.intent.rule.name)
+        print(context.intent.rule.execution(context))
+    except ContextNotCreatedException as e:
+        print("Sorry, i can't create a context from the input you introduced")
+        print(e)
+        return
+
 while(True):
     #selected_prompt = test_prompts[int(input(os.getenv("ASSISTANT") + ": (0-14) "))]  # Solicitar al usuario que ingrese un prompt para analizar.
     prompt = input("NOVA-02: ")
     chatbot(prompt)
+
 
 
 
