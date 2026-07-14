@@ -15,7 +15,7 @@ def action_scoring(rule:IntentRule, frame:RoleFrame, p_text:ParsedText, score:in
         for token in p_text.linguistic_analisys.pos:
             if token.lemma in rule.actions:
                 not_roled_actions_found += 1
-                score += 25
+                score += 50
 
         if not_roled_actions_found == 0:
             #score -= 20
@@ -76,4 +76,5 @@ def score_rule(rule:IntentRule, frame:RoleFrame, p_text:ParsedText):
     except ActionNotFoundException as e:
         rule_scoring_exceptions.append(e)
 
+    print(rule.name + ": " + str(score))
     return score

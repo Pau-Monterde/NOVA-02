@@ -5,6 +5,8 @@ from engine.semantic_extractor import roles_extraction
 from engine.parser.text_parsing import parse_text
 from engine.intent.classifier import classify_intent
 from engine.parser.text_parsing import parse_text
+from engine.models.speech_act import SpeechAct
+from engine.speech_act_classifier import classify_speech_act
     
 def generate_rcontext(prompt:str):
         context_status = ContextStatus(True)
@@ -14,6 +16,8 @@ def generate_rcontext(prompt:str):
         except LinguisticAnalyzerFatalException as e:
                 context_status.fatal_exception = e
                 raise ContextNotCreatedException(context_status.fatal_exception)
+        
+        speech_act = classify_speech_act(parse_text)
 
         role_frame, semantic_exceptions_list = roles_extraction(parsed_text)
         if semantic_exceptions_list: context_status.semantic_exceptions = semantic_exceptions_list

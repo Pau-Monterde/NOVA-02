@@ -1,10 +1,11 @@
-from engine.models.exceptions.context_exceptions import ContextNotCreatedException, NotRootVerbInContextException
+from engine.models.exceptions.context_exceptions import ContextNotCreatedException, NotRootVerbInContextException, PropmtIsNotCommandException
 from engine.context_generator import generate_rcontext
 from engine.models.context_model import RequestContext
+from llm_manager import call_llm, generate_response 
+from engine.models.history import ConversationHistory, HistoryEntry
+from db import save_conversation
 
 def context_generation(prompt:str):
-    print("Analizando el prompt: " + prompt)  # Mostrar el prompt seleccionado para análisis.
-
     context:RequestContext = generate_rcontext(prompt)  # Crear una instancia de Prompt con el texto ingresado.
 
     if not context.status.success:
@@ -82,21 +83,40 @@ def testing_chatbot(prompt:str):
     # except:
     #     pass
 
-def chatbot(prompt:str):
+def chatbot(conversation_history:ConversationHistory):
+    prompt = input("You: ")
+    conversation_history.entry_list.append(HistoryEntry("user", prompt))
+
+    if prompt.lower().strip() == "exit":
+        print(f"Bye! Conversation history: {conversation_history.messages_list()}")
+        return 
+
     try: 
         context:RequestContext = context_generation(prompt)
-        print(context.intent.rule.name)
-        print(context.intent.rule.execution(context))
-    except ContextNotCreatedException as e:
-        print("Sorry, i can't create a context from the input you introduced")
-        print(e)
-        return
+        print("Demanda de skill detectada: " + context.intent.rule.name)
 
-while(True):
-    #selected_prompt = test_prompts[int(input(os.getenv("ASSISTANT") + ": (0-14) "))]  # Solicitar al usuario que ingrese un prompt para analizar.
-    prompt = input("NOVA-02: ")
-    chatbot(prompt)
+        phrase:str = context.intent.rule.execution(context)
+        response = generate_response(phrase, conversation_history.messages_list())
+        print("NOVA-02: " + response)
 
+        conversation_history.entry_list.append(HistoryEntry("assistant", response))
+        return conversation_history
+    
+    except (ContextNotCreatedException, PropmtIsNotCommandException):
+        response = call_llm(conversation_history.messages_list())
+        print("NOVA-02: " + response)
+        conversation_history.entry_list.append(HistoryEntry("assistant", response))
+        
+        return conversation_history
+    
+def main():
+    conversation_history = ConversationHistory()
 
+    while(True):
+        conversation_history = chatbot(conversation_history)
 
+        if not conversation_history:
+            break
+    
+main()
 

@@ -11,9 +11,9 @@ INTENT_RULES = [
 
     IntentRule(
         name="SHOW_CURRENT_TIME",
-        actions=["show", "tell", "display"],
+        actions=["show", "tell", "display", "what"],
         required_roles=[],
-        keywords=["time", "clock"],
+        keywords=["time", "clock", "hour"],
         execution = show_current_time
     ),
 
@@ -21,7 +21,7 @@ INTENT_RULES = [
         name="OPEN_APP",
         actions=["open"],
         required_roles=["TARGET"],
-        keywords=["app", "application", "program"],
+        keywords=["spotify", "chrome", "whatsapp"],
         execution = open_app
     ),
 
@@ -49,7 +49,7 @@ def classify_intent(frame:RoleFrame, p_text:ParsedText):
             best_score = score
             best_intent = rule
     
-    if not best_intent or best_score <= 10 and len(scored_intents) > 1:
+    if not best_intent or best_score < 60:
         raise IntentNotFoundException()
 
     return Intent(best_intent, best_score)

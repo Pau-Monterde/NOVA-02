@@ -5,7 +5,10 @@ from engine.models.context_model import RequestContext
 
 
 def open_app(context: RequestContext):
-    target_app = context.role_frame.get_role("TARGET").value
+    try:
+        target_app = context.role_frame.get_role("TARGET").value
+    except Exception as e:
+        pass
     print(target_app)
     showinfo(message=f"Abriendo {target_app}")
 

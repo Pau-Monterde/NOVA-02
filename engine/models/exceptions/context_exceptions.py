@@ -1,6 +1,9 @@
 class ContextNotCreatedException(Exception):
-    def __init__(self, fatal_exception:Exception):
-        super().__init__(f"NOVA-02 can't create context --> {fatal_exception}")
+    def __init__(self, fatal_exception:Exception | None = None):
+        if fatal_exception:
+            super().__init__(f"NOVA-02 can't create context --> {fatal_exception}")
+        else: 
+            super().__init__(f"NOVA-02 can't create context")
 
 class POSNotFoundInDocException(Exception):
     def __init__(self):
@@ -45,3 +48,7 @@ class KeywordsNotFoundException(Exception):
 class ActionNotFoundException(Exception):
     def __init__(self):
         super().__init__("There isn't an action in context")
+
+class PropmtIsNotCommandException(Exception):
+    def __init__(self):
+        super().__init__("Introduced prompt is not a command")
