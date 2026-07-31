@@ -8,7 +8,7 @@ from engine.parser.text_parsing import parse_text
 from engine.models.speech_act import SpeechAct
 from engine.intent.speech_act_detector import detect_speech_act
     
-def generate_rcontext(prompt:str):
+def generate_rcontext(prompt:str, context_intents:list | None = None):
         context_status = ContextStatus(True)
         #w_list = re.sub(r"([^\w\s])", r" \1 ", string).lower().split()
         try:
@@ -23,7 +23,7 @@ def generate_rcontext(prompt:str):
         if semantic_exceptions_list: context_status.semantic_exceptions = semantic_exceptions_list
 
         try: 
-                intent = classify_intent(role_frame, parsed_text, speech_act)
+                intent = classify_intent(role_frame, parsed_text, speech_act, context_intents)
         except IntentNotFoundException as infe:
                 intent = None
                 context_status.fatal_exception = infe

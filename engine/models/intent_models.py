@@ -10,7 +10,7 @@ class IntentRule:
 
 class ContextIntent(IntentRule):
     def __init__(self, name:str, actions:list[str], required_roles:list[str] | None = None, keywords:list[str] | None = None, min_score:float = 60, context_intents:list | None = None, execution = None):
-        super().__init__(name, actions, required_roles, keywords, min_score, execution)
+        super().__init__(name, actions, required_roles, keywords, min_score, context_intents, execution)
         
 class Intent:
     def __init__(self, rule:IntentRule, score:float):

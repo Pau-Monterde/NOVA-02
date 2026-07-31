@@ -29,13 +29,25 @@ def act_list(speech_act:SpeechAct):
     elif speech_act == SpeechAct.UNKNOWN.value:
         return UNKNOWN_RULES
     
-def classify_intent(frame:RoleFrame, p_text:ParsedText, speech_act:SpeechAct):
+def classify_intent(frame:RoleFrame, p_text:ParsedText, speech_act:SpeechAct, context_intents:list | None = None):
     print(speech_act)
+    
     intent_list = act_list(speech_act)
 
     best_intent = None
     scored_intents = []
     best_score = 0
+
+    if context_intents:
+        print("Avaluando por context intent")
+        for rule in context_intents:
+            score = score_rule(rule, frame, p_text)
+            if score >= 10:
+                scored_intents.append(rule)
+    
+            if score > best_score:
+                best_score = score
+                best_intent = rule
 
     for rule in intent_list:
         score = score_rule(rule, frame, p_text)
@@ -47,7 +59,7 @@ def classify_intent(frame:RoleFrame, p_text:ParsedText, speech_act:SpeechAct):
             best_score = score
             best_intent = rule
     
-    if not best_intent or best_score < 60:
+    if not best_intent or best_score < 60 and type(best_intent) != ContextIntent:
         raise IntentNotFoundException()
 
     return Intent(best_intent, best_score)

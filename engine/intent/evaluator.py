@@ -1,4 +1,4 @@
-from engine.models.intent_models import IntentRule
+from engine.models.intent_models import IntentRule, ContextIntent
 from engine.models.semantic_models import RoleFrame, RoleEntity
 from engine.models.parser_models import ParsedText
 from engine.models.exceptions.context_exceptions import ActionNotFoundException, KeywordsNotFoundException, RequiredRolesNotFoundException
@@ -28,7 +28,6 @@ def action_scoring(rule:IntentRule, frame:RoleFrame, p_text:ParsedText, score:in
 
 def required_roles_scoring(rule:IntentRule, frame:RoleFrame, score:int):
     initial_score = score
-
     for role in rule.required_roles:
         if frame.get_role(role):
             score += 15
@@ -57,18 +56,20 @@ def score_rule(rule:IntentRule, frame:RoleFrame, p_text:ParsedText):
     score = 0
 
     try: 
-        score = required_roles_scoring(rule, frame, score)
+        if rule.required_roles:
+            score = required_roles_scoring(rule, frame, score)
     except RequiredRolesNotFoundException as e:
         rule_scoring_exceptions.append(e)
         score -= 10
 
-    try: 
-        score = keyword_scoring(rule, p_text, score)
+    try:
+        if rule.keywords:
+            score = keyword_scoring(rule, p_text, score)
     except KeywordsNotFoundException as e:
         rule_scoring_exceptions.append(e)
         score -= 10
 
-    if score <= 0:
+    if score <= 0 and type(rule) != ContextIntent:
         return score
     
     try:

@@ -15,7 +15,7 @@ class ContextStatus():
 
 class RequestContext():
 
-    def __init__(self, prompt_str:str, status:ContextStatus, parsed_text:ParsedText, role_frame:RoleFrame | None = None, intent:Intent | None= None):
+    def __init__(self, prompt_str:str, status:ContextStatus, parsed_text:ParsedText, role_frame:RoleFrame | None = None, intent:Intent | None = None, context_intents:list | None = None):
 
         self.prompt_str = prompt_str
 
@@ -27,6 +27,8 @@ class RequestContext():
 
         # Intención
         self.intent = intent 
+
+        self.context_intents = context_intents
 
         # Ejecución
         self.status = status
