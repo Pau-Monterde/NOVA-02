@@ -1,9 +1,9 @@
 from engine.models.exceptions.context_exceptions import ContextNotCreatedException, NotRootVerbInContextException, PropmtIsNotCommandException
 from engine.context_generator import generate_rcontext
 from engine.models.context_model import RequestContext
-from llm_manager import call_llm, generate_response 
+from llm_manager import normalize_prompt, call_llm, generate_response 
 from engine.models.history import ConversationHistory, HistoryEntry
-from db import save_conversation
+from db import save_conversation, actualize_conversation
 
 def context_generation(prompt:str):
     context:RequestContext = generate_rcontext(prompt)  # Crear una instancia de Prompt con el texto ingresado.
@@ -83,20 +83,16 @@ def testing_chatbot(prompt:str):
     # except:
     #     pass
 
-def chatbot(conversation_history:ConversationHistory):
-    prompt = input("You: ")
-    conversation_history.entry_list.append(HistoryEntry("user", prompt))
-
-    if prompt.lower().strip() == "exit":
-        print(f"Bye! Conversation history: {conversation_history.messages_list()}")
-        return 
+def chatbot(prompt:str, conversation_history:ConversationHistory):
+    normalized_prompt = normalize_prompt(prompt)
+    print(normalized_prompt)
 
     try: 
-        context:RequestContext = context_generation(prompt)
+        context:RequestContext = context_generation(normalized_prompt)
         print("Demanda de skill detectada: " + context.intent.rule.name)
 
-        phrase:str = context.intent.rule.execution(context)
-        response = generate_response(phrase, conversation_history.messages_list())
+        phrase = context.intent.rule.execution(context)
+        response = generate_response(phrase)
         print("NOVA-02: " + response)
 
         conversation_history.entry_list.append(HistoryEntry("assistant", response))
@@ -111,12 +107,24 @@ def chatbot(conversation_history:ConversationHistory):
     
 def main():
     conversation_history = ConversationHistory()
+    fisrt_lap = True
 
     while(True):
-        conversation_history = chatbot(conversation_history)
+        prompt = input("You: ")
 
-        if not conversation_history:
-            break
-    
+        conversation_history.entry_list.append(HistoryEntry("user", prompt))
+
+        if prompt.lower().strip() == "exit":
+            print(f"Bye! Conversation history: {conversation_history.messages_list()}")
+            return conversation_history
+
+        conversation_history:ConversationHistory = chatbot(prompt, conversation_history)
+
+        if fisrt_lap == True:
+            result = save_conversation(conversation_history)
+            fisrt_lap = False
+        
+        else: 
+            actualize_conversation(result, conversation_history)
 main()
 

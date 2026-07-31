@@ -1,45 +1,43 @@
 from engine.models.semantic_models import RoleFrame
 from engine.models.intent_models import Intent, IntentRule
 from engine.models.parser_models import ParsedText
+from engine.intent.intent_rules import *
 from engine.executor.skills.file_sender import send_file
 from engine.executor.skills.app_opening import open_app
 from engine.executor.skills.clock import show_current_time
 from engine.intent.evaluator import score_rule
 from engine.models.exceptions.context_exceptions import IntentNotFoundException
+from engine.models.speech_act import SpeechAct
 
-INTENT_RULES = [
+def act_list(speech_act:SpeechAct):
+    if speech_act == SpeechAct.EXECUTION.value:
+        return EXECUTION_RULES
+    elif speech_act == SpeechAct.INFORMATION.value:
+        return INFORMATION_RULES
+    elif speech_act == SpeechAct.EXPLANATION.value:
+        return EXPLANATION_RULES
+    elif speech_act == SpeechAct.CONVERSATION.value:
+        return CONVERSATION_RULES
+    elif speech_act == SpeechAct.CONFIRMATION.value:
+        return CONFIRMATION_RULES
+    elif speech_act == SpeechAct.CLARIFICATION.value:
+        return CLARIFICATION_RULES
+    elif speech_act == SpeechAct.CORRECTION.value:
+        return CORRECTION_RULES
+    elif speech_act == SpeechAct.FEEDBACK.value:
+        return FEEDBACK_RULES
+    elif speech_act == SpeechAct.UNKNOWN.value:
+        return UNKNOWN_RULES
+    
+def classify_intent(frame:RoleFrame, p_text:ParsedText, speech_act:SpeechAct):
+    print(speech_act)
+    intent_list = act_list(speech_act)
 
-    IntentRule(
-        name="SHOW_CURRENT_TIME",
-        actions=["show", "tell", "display", "what"],
-        required_roles=[],
-        keywords=["time", "clock", "hour"],
-        execution = show_current_time
-    ),
-
-    IntentRule(
-        name="OPEN_APP",
-        actions=["open"],
-        required_roles=["TARGET"],
-        keywords=["spotify", "chrome", "whatsapp"],
-        execution = open_app
-    ),
-
-    IntentRule(
-        name="SEND_FILE",
-        actions=["send"],
-        required_roles=["TARGET", "RECIPIENT"],
-        keywords=["file", "document", "attachment"],
-        execution = send_file
-    )
-]
-
-def classify_intent(frame:RoleFrame, p_text:ParsedText):
     best_intent = None
     scored_intents = []
     best_score = 0
 
-    for rule in INTENT_RULES:
+    for rule in intent_list:
         score = score_rule(rule, frame, p_text)
 
         if score >= 10:

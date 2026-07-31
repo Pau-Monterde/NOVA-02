@@ -21,3 +21,4 @@ def open_app(context: RequestContext):
 
     print("App abierta")
     
+    
