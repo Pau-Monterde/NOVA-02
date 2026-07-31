@@ -91,7 +91,11 @@ def chatbot(prompt:str, conversation_history:ConversationHistory):
         context:RequestContext = context_generation(normalized_prompt)
         print("Demanda de skill detectada: " + context.intent.rule.name)
 
-        phrase = context.intent.rule.execution(context)
+        try:
+            phrase = context.intent.rule.execution(context)
+        except:
+            raise PropmtIsNotCommandException
+        
         response = generate_response(phrase)
         print("NOVA-02: " + response)
 

@@ -2,9 +2,25 @@ from engine.executor.skills.file_sender import send_file
 from engine.executor.skills.app_opening import open_app
 from engine.executor.skills.clock import show_current_time
 from engine.intent.evaluator import score_rule
-from engine.models.intent_models import Intent, IntentRule
+from engine.models.intent_models import IntentRule, ContextIntent
 
 EXECUTION_RULES = [
+    IntentRule(
+        name="SPOTIFY_CONTROL",
+        actions=["play", "open", "run"],
+        required_roles=["TARGET"],
+        keywords=["spotify", "song", "reproduce", "put"],
+        context_intents=[
+            ContextIntent(
+                name="NEXT_SONG",
+                actions=["pass", "next"],
+                min_score=30,
+                execution=None
+            ),
+        ],
+        execution=None
+    ),
+
     IntentRule(
         name="OPEN_APP",
         actions=["open"],
