@@ -5,6 +5,7 @@ from engine.models.history import ConversationHistory, HistoryEntry
 client = MongoClient("mongodb://localhost:27017/")
 db = client["NOVA-02-DB"]
 conversations = db["conversations-history"]
+program_data = db["program-data"]
 
 def save_conversation(conversation_history: ConversationHistory):
     result:InsertOneResult = conversations.insert_one({f"conversation {conversations.count_documents({})}": conversation_history.messages_list()})
