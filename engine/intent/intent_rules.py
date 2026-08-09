@@ -2,7 +2,7 @@ from engine.models.intent_models import IntentRule, ContextIntent
 from engine.executor.skills.file_sender import send_file
 from engine.executor.skills.app_opening import open_app
 from engine.executor.skills.clock import show_current_time
-from engine.executor.skills.spotify_control import spotify_control, next_track
+from engine.executor.skills.spotify_control import spotify_control, next_track, prev_track, play, pause
 
 EXECUTION_RULES = [
     IntentRule(
@@ -12,13 +12,41 @@ EXECUTION_RULES = [
         keywords = ["spotify", "song", "reproduce", "put"],
         context_intents = [
             ContextIntent(
+                name = "PLAY",
+                actions = ["start", "play"],
+                min_score = 30,
+                execution = play
+            ),
+
+            ContextIntent(
+                name = "PAUSE",
+                actions = ["stop", "pause"],
+                min_score = 30,
+                execution = pause
+            ),
+
+            ContextIntent(
                 name = "NEXT_SONG",
                 actions = ["pass", "next"],
                 min_score = 30,
                 execution = next_track
             ),
+
+            ContextIntent(
+                name = "PREV_SONG",
+                actions = ["last", "previous"],
+                min_score = 30,
+                execution = prev_track
+            ),
         ],
         execution = spotify_control
+    ),
+
+    IntentRule(
+        name = "SET_ALARM",
+        actions = ["set", "put", "create"],
+        keywords = ["alarm"],
+        execution = None
     ),
 
     IntentRule(

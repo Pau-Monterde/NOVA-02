@@ -115,6 +115,7 @@ def main():
     conversation_history = ConversationHistory()
     fisrt_lap = True
     context = None
+    context_intents = None
 
     while(True):
         prompt = input("You: ")
@@ -125,7 +126,11 @@ def main():
             return conversation_history
 
         if context:
-            context_intents = context.intent.rule.context_intents
+            if context_intents:
+                context_intents = context_intents.extend(context.intent.rule.context_intents)
+            else:
+                context_intents = context.intent.rule.context_intents
+
             conversation_history, context = chatbot(prompt, conversation_history, context_intents)
             
             if not context.intent.rule.context_intents:
