@@ -7,9 +7,9 @@ from engine.executor.skills.spotify_control import spotify_control, next_track, 
 EXECUTION_RULES = [
     IntentRule(
         name = "SPOTIFY_CONTROL",
-        actions = ["play", "open", "run"],
+        actions = ["play", "open", "run", "put"],
         required_roles = ["TARGET"],
-        keywords = ["spotify", "song", "reproduce", "put"],
+        keywords = ["spotify", "music", "reproduce"],
         context_intents = [
             ContextIntent(
                 name = "PLAY",

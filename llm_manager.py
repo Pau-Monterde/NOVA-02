@@ -64,7 +64,7 @@ def call_llm(messages, temperature:float = 0.8) -> str:
     resp = requests.post(
     "http://localhost:11434/api/chat",
     json={
-        "model": "llama3.2",
+        "model": "gemma3:1b",
         "messages": messages,
         "stream": False,
         "options": {
@@ -102,7 +102,7 @@ def generate_response(phrase:str) -> str:
     resp = requests.post(
     "http://localhost:11434/api/generate",
     json={
-        "model": "llama3.2",
+        "model": "gemma3:1b",
         "prompt": prompt,
         "stream": False,
         "options": {
