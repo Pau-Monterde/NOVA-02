@@ -4,6 +4,7 @@ from engine.models.parser_models import ParsedText
 from engine.models.intent_models import Intent
 from engine.models.parser_models import ParserExceptions
 from engine.models.semantic_models import SemanticExceptions
+from engine.models.bus_model import EventBus
 
 class ContextStatus():
     def __init__(self, success:bool = True, fatal_exception:Exception | None = None, parser_exceptions:ParserExceptions | None = None, semantic_exceptions:SemanticExceptions | None = None):
@@ -28,10 +29,19 @@ class RequestContext():
         # Intención
         self.intent = intent 
 
+        # Respuesta del intent
+        self.response_raw:str
+
+        # Respuesta definitiva procesada por el llm
+        self.response:str
+
         self.context_intents = context_intents
 
         # Ejecución
         self.status = status
+
+        # Buzón de eventos
+        self.event_bus = EventBus()
     
 
         
