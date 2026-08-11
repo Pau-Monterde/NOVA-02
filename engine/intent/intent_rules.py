@@ -3,13 +3,14 @@ from engine.executor.skills.file_sender import send_file
 from engine.executor.skills.app_opening import open_app
 from engine.executor.skills.clock import show_current_time
 from engine.executor.skills.spotify_control import spotify_control, next_track, prev_track, play, pause
+from engine.executor.skills.get_weather import show_wheather
 
 EXECUTION_RULES = [
     IntentRule(
         name = "SPOTIFY_CONTROL",
-        actions = ["play", "open", "run", "put"],
+        actions = ["play", "open", "run", "put", "reproduce"],
         required_roles = ["TARGET"],
-        keywords = ["spotify", "music", "reproduce"],
+        keywords = ["spotify", "music"],
         context_intents = [
             ContextIntent(
                 name = "PLAY",
@@ -73,7 +74,14 @@ INFORMATION_RULES = [
         required_roles = [],
         keywords = ["time", "clock", "hour"],
         execution = show_current_time
-    )
+    ),
+
+    IntentRule(
+        name = "SHOW_WEATHER",
+        actions = ["show", "tell", "display", "what", "how"],
+        keywords = ["weather", "temperature"],
+        execution = show_wheather
+    ),
 ]
 
 EXPLANATION_RULES = [

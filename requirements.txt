@@ -2,3 +2,5 @@ fastapi
 pymongo
 spacy
 json
+pydantic
+pywebview

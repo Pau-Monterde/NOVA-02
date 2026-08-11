@@ -3,7 +3,8 @@ from engine.context_generator import generate_rcontext
 from engine.models.context_model import RequestContext
 from llm_manager import normalize_prompt, call_llm, generate_response 
 from engine.models.history import ConversationHistory, HistoryEntry
-from db import save_conversation, actualize_conversation
+from db import save_conversation, actualize_conversation, save_user, get_user
+from engine.models.user_model import UserData
 
 def context_generation(prompt:str, context_intents:list | None = None):
     context:RequestContext = generate_rcontext(prompt, context_intents)  # Crear una instancia de Prompt con el texto ingresado.
@@ -46,6 +47,15 @@ def main():
     fisrt_lap = True
     context_intents = []
 
+    user_data:UserData = get_user()
+
+    if not user_data:
+        print("No hay user")
+    else: 
+        print(user_data.username)
+
+    save_user(user_data)
+
     while(True):
         prompt = input("You: ")
         conversation_history.entry_list.append(HistoryEntry("user", prompt))
@@ -59,7 +69,6 @@ def main():
         if type(context) == RequestContext:
             if context.intent.rule.context_intents:
                 context_intents = list(set(context_intents + context.intent.rule.context_intents))
-                print(context_intents)
 
         if fisrt_lap == True:
             result = save_conversation(conversation_history)
