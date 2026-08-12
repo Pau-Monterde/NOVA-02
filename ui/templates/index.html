@@ -8,6 +8,8 @@
 <body style="background-color: white;">
     <h1>Hola Mundo</h1>
     <p id="event">Event</p>
+    <input type="text" id="input_str">
+    <button onclick="send_input()">Enviar</button>
     <script>
         function receive_event(event) {
             document.getElementById("event").textContent = "Evento recibido: " + event
@@ -20,6 +22,12 @@
         window.addEventListener("pywebviewready", function() {
             saludar();
         });
+
+        function send_input() {
+            var input_str = document.getElementById("input_str").value 
+            pywebview.api.put_input(input_str)
+            document.getElementById("input_str").value = ""
+        }
     </script>
 </body>
 </html>

@@ -27,6 +27,9 @@ from db import (
 
 from engine.models.user_model import UserData
 
+from ui.ui import user_interface
+from ui.api import Api
+
 import threading
 from queue import Queue
 
@@ -42,7 +45,7 @@ def context_generation(prompt: str, context_intents: list | None = None):
 def chatbot(conversation_history: ConversationHistory, input_queue: Queue, context_intents: list | None = None):
 
     # Cogemos el siguiente mensaje del buzón
-    prompt = input("You: ")
+    prompt = input_queue.get()
 
     conversation_history.entry_list.append(HistoryEntry("user", prompt))
 
@@ -133,6 +136,10 @@ def main():
 
     # Arrancamos el engine
     engine_thread.start()
+
+    api = Api(input_queue)
+
+    user_interface(api)
 
     # Prueba temporal:
     # input_queue.put("hola")
