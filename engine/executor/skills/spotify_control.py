@@ -22,16 +22,21 @@ def spotify_control(context:RequestContext):
         sp.start_playback()
 
     except Exception as e:
-        return "No se ha podido ejecutar spotify en el dispositivo"
+        context.response_raw = "No se ha podido ejecutar spotify en el dispositivo"
+        return context
 
 def play(context:RequestContext):
     sp.start_playback()
+    return context
 
 def pause(context:RequestContext):
     sp.pause_playback()
+    return context
 
 def next_track(context:RequestContext):
     sp.next_track()
+    return context
 
 def prev_track(context:RequestContext):
     sp.previous_track()
+    return context

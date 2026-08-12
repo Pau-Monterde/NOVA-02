@@ -115,8 +115,10 @@ def show_wheather(context:RequestContext):
     for location in locations:
         w_string = get_weather(location)
         response += w_string
+
+    context.response_raw = response
         
-    return response
+    return context
             
 
     

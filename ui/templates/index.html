@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA-02</title>
+</head>
+<body style="background-color: white;">
+    <h1>Hola Mundo</h1>
+    <p id="event">Event</p>
+    <script>
+        function receive_event(event) {
+            document.getElementById("event").textContent = "Evento recibido: " + event
+        }
+
+        function saludar() {
+            pywebview.api.saludar("Pau")
+        }
+
+        window.addEventListener("pywebviewready", function() {
+            saludar();
+        });
+    </script>
+</body>
+</html>

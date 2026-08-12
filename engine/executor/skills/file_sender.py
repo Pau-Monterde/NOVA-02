@@ -13,4 +13,6 @@ def send_file(context:RequestContext):
 
     if recipient:
         return "File sent to " + recipient
-    return "File sent succesfully"
+
+    context.response_raw = "File sent succesfully"
+    return context
