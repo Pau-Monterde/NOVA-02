@@ -1,7 +1,7 @@
 from typing import Any
 from engine.models.semantic_models import RoleFrame
 from engine.models.parser_models import ParsedText
-from engine.models.intent_models import Intent
+from engine.models.intent_models import Intent, ContextIntent
 from engine.models.parser_models import ParserExceptions
 from engine.models.semantic_models import SemanticExceptions
 from engine.models.bus_model import EventBus
@@ -30,12 +30,12 @@ class RequestContext():
         self.intent = intent 
 
         # Respuesta del intent
-        self.response_raw:str
+        self.response_raw:str = ""
 
         # Respuesta definitiva procesada por el llm
         self.response:str
 
-        self.context_intents = context_intents
+        self.context_intents:list[ContextIntent] = context_intents
 
         # Ejecución
         self.status = status

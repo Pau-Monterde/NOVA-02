@@ -4,30 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NOVA-02</title>
+    <link rel="stylesheet" href="/ui/static/css/index.css">
 </head>
 <body style="background-color: white;">
     <h1>Hola Mundo</h1>
+    <main class="main-container">
+        <div class="messages-container" id="messages">
+            
+        </div>
+        <div class="input-container">
+            <input type="text" id="input_str">
+            <button onclick="send_input()">Enviar</button>
+        </div>
+    </main>
     <p id="event">Event</p>
-    <input type="text" id="input_str">
-    <button onclick="send_input()">Enviar</button>
-    <script>
-        function receive_event(event) {
-            document.getElementById("event").textContent = "Evento recibido: " + event
-        }
-
-        function saludar() {
-            pywebview.api.saludar("Pau")
-        }
-
-        window.addEventListener("pywebviewready", function() {
-            saludar();
-        });
-
-        function send_input() {
-            var input_str = document.getElementById("input_str").value 
-            pywebview.api.put_input(input_str)
-            document.getElementById("input_str").value = ""
-        }
-    </script>
+    <div class="chat"></div>
+    <script src="../static/js/index.js"></script>
 </body>
 </html>

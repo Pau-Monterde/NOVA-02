@@ -49,6 +49,6 @@ class ActionNotFoundException(Exception):
     def __init__(self):
         super().__init__("There isn't an action in context")
 
-class PropmtIsNotCommandException(Exception):
+class PromptIsNotCommandException(Exception):
     def __init__(self):
         super().__init__("Introduced prompt is not a command")

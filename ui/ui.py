@@ -1,22 +1,25 @@
 import webview
-from jinja2 import Environment, FileSystemLoader
+from webview import Window
 from ui.api import Api
+from engine.models.queues_model import EngineQueues
+import json
 
-def user_interface(api):
+def listen_responses(window:Window, engine_queues:EngineQueues):
+    while(True):
+        response = engine_queues.response_queue.get()
+        window.evaluate_js(f"write_response({json.dumps(response)})")
 
-    env = Environment(loader=FileSystemLoader("ui/templates"))
-
-    template = env.get_template("index.html")
-
-
+def user_interface(api:Api, engine_queues:EngineQueues):
     window = webview.create_window(
         title = "NOVA-02",
-        html = template.render(),
+        url = "ui/templates/index.html",
         js_api = api,
         width = 1200,
-        height = 700
+        height = 700,
     )
 
-    webview.start()
+    print(window.events)
+
+    webview.start(func = listen_responses, args = (window, engine_queues), http_server=True)
 
     return window

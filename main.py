@@ -1,11 +1,12 @@
 from engine.models.exceptions.context_exceptions import (
     ContextNotCreatedException,
     NotRootVerbInContextException,
-    PropmtIsNotCommandException
+    PromptIsNotCommandException
 )
 
 from engine.context_generator import generate_rcontext
 from engine.models.context_model import RequestContext
+from engine.models.queues_model import EngineQueues
 
 from llm_manager import (
     normalize_prompt,
@@ -33,7 +34,6 @@ from ui.api import Api
 import threading
 from queue import Queue
 
-
 def context_generation(prompt: str, context_intents: list | None = None):
     context: RequestContext = generate_rcontext(prompt, context_intents)
 
@@ -42,10 +42,11 @@ def context_generation(prompt: str, context_intents: list | None = None):
 
     return context
 
-def chatbot(conversation_history: ConversationHistory, input_queue: Queue, context_intents: list | None = None):
+def chatbot(conversation_history: ConversationHistory, engine_queues:EngineQueues, context_intents: list | None = None):
 
     # Cogemos el siguiente mensaje del buzón
-    prompt = input_queue.get()
+    prompt:str = engine_queues.input_queue.get()
+    print(get_user().alias + ": " +  prompt)
 
     conversation_history.entry_list.append(HistoryEntry("user", prompt))
 
@@ -55,7 +56,7 @@ def chatbot(conversation_history: ConversationHistory, input_queue: Queue, conte
             f"{conversation_history.messages_list()}"
         )
 
-        return conversation_history
+        return conversation_history, None
 
     normalized_prompt = normalize_prompt(prompt)
 
@@ -63,7 +64,7 @@ def chatbot(conversation_history: ConversationHistory, input_queue: Queue, conte
 
     try:
 
-        context: RequestContext = context_generation(normalized_prompt, context_intents)
+        context:RequestContext = context_generation(normalized_prompt, context_intents)
 
         print("Demanda de skill detectada: " + context.intent.rule.name)
 
@@ -74,44 +75,35 @@ def chatbot(conversation_history: ConversationHistory, input_queue: Queue, conte
 
         except Exception as e:
             print(e)
-            raise PropmtIsNotCommandException()
+            raise PromptIsNotCommandException()
 
         context.response = generate_response(context.response_raw)
-
-        print("NOVA-02: " + context.response)
+        engine_queues.response_queue.put(context.response)
 
         conversation_history.entry_list.append(HistoryEntry("assistant", context.response))
 
         return conversation_history, context
 
-    except (ContextNotCreatedException, PropmtIsNotCommandException):
-
+    except (ContextNotCreatedException, PromptIsNotCommandException):
         response = call_llm(conversation_history.messages_list())
-
-        print("NOVA-02: " + response)
+        engine_queues.response_queue.put(response)
 
         conversation_history.entry_list.append(HistoryEntry("assistant", response))
 
         return conversation_history, None
 
-
-def engine(input_queue: Queue):
+def engine(engine_queues:EngineQueues):
     print("ENGINE ACTIVATED")
 
     user_data: UserData = get_user()
-
-    if not user_data:
-        print("No hay user")
-
-    else:
-        print(user_data.username)
+    print(user_data.username)
 
     conversation_history = ConversationHistory()
     first_lap = True
     context_intents = []
 
     while True:
-        conversation_history, context = chatbot(conversation_history, input_queue, context_intents)
+        conversation_history, context = chatbot(conversation_history, engine_queues, context_intents)
 
         if type(context) == RequestContext:
             if context.intent.rule.context_intents:
@@ -129,21 +121,18 @@ def engine(input_queue: Queue):
 def main():
 
     # Creamos el buzón
-    input_queue = Queue()
+    engine_queues = EngineQueues()
 
     # Creamos el hilo del engine
-    engine_thread = threading.Thread(target=engine,args=(input_queue,))
+    engine_thread = threading.Thread(target=engine, args=(engine_queues,))
 
     # Arrancamos el engine
     engine_thread.start()
 
-    api = Api(input_queue)
+    api = Api(engine_queues)
 
-    user_interface(api)
+    engine_queues.input_queue.put("Hola, que tal?")
 
-    # Prueba temporal:
-    # input_queue.put("hola")
-
-    # Más adelante:
-    # user_interface()
+    user_interface(api, engine_queues)
+    
 main()
